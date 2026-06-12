@@ -2,11 +2,16 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 
+
 MODEL_PATH = "model/brain_tumor_model.h5"
 IMG_SIZE = 150
 
-# Important: This order must match the dataset class order printed during training.
-class_names = ["glioma", "meningioma", "notumor", "pituitary"]
+class_names = [
+    "Glioma Tumor",
+    "Meningioma Tumor",
+    "No Tumor",
+    "Pituitary Tumor"
+]
 
 
 def predict_tumor(img_path):
@@ -18,15 +23,16 @@ def predict_tumor(img_path):
     img_array = np.expand_dims(img_array, axis=0)
 
     prediction = model.predict(img_array)
+
     predicted_index = np.argmax(prediction)
     confidence = np.max(prediction) * 100
-
     result = class_names[predicted_index]
+
     return result, confidence
 
 
 if __name__ == "__main__":
-    image_path = input("Enter MRI image path: ")
+    image_path = input("Enter image path: ")
     result, confidence = predict_tumor(image_path)
 
     print("Prediction:", result)
