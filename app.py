@@ -16,9 +16,7 @@ def load_trained_model():
     if not os.path.exists(MODEL_PATH):
         st.error("Model file not found. Please upload model/brain_tumor_model.h5 to GitHub.")
         st.stop()
-
-    model = load_model(MODEL_PATH)
-    return model
+    return load_model(MODEL_PATH)
 
 
 def preprocess_image(uploaded_image):
@@ -57,7 +55,6 @@ def main():
 
     if uploaded_file is not None:
         model = load_trained_model()
-
         img, processed_img = preprocess_image(uploaded_file)
 
         st.image(img, caption="Uploaded MRI Image", use_container_width=True)
