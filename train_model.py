@@ -4,15 +4,20 @@ import matplotlib.pyplot as plt
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, BatchNormalization
+from tensorflow.keras.layers import (
+    Conv2D,
+    MaxPooling2D,
+    Flatten,
+    Dense,
+    Dropout,
+    BatchNormalization
+)
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
 
 from sklearn.metrics import classification_report, confusion_matrix
 
-# -----------------------------
-# Paths
-# -----------------------------
+
 TRAIN_DIR = "dataset/Training"
 TEST_DIR = "dataset/Testing"
 MODEL_DIR = "model"
@@ -20,16 +25,11 @@ MODEL_PATH = os.path.join(MODEL_DIR, "brain_tumor_model.h5")
 
 os.makedirs(MODEL_DIR, exist_ok=True)
 
-# -----------------------------
-# Settings
-# -----------------------------
 IMG_SIZE = 150
 BATCH_SIZE = 32
 EPOCHS = 15
 
-# -----------------------------
-# Data Preprocessing
-# -----------------------------
+
 train_datagen = ImageDataGenerator(
     rescale=1.0 / 255,
     rotation_range=15,
@@ -38,7 +38,10 @@ train_datagen = ImageDataGenerator(
     validation_split=0.2
 )
 
-test_datagen = ImageDataGenerator(rescale=1.0 / 255)
+test_datagen = ImageDataGenerator(
+    rescale=1.0 / 255
+)
+
 
 train_data = train_datagen.flow_from_directory(
     TRAIN_DIR,
@@ -66,11 +69,10 @@ test_data = test_datagen.flow_from_directory(
     shuffle=False
 )
 
+
 print("Class Labels:", train_data.class_indices)
 
-# -----------------------------
-# CNN Model
-# -----------------------------
+
 model = Sequential([
     Conv2D(32, (3, 3), activation="relu", input_shape=(IMG_SIZE, IMG_SIZE, 3)),
     BatchNormalization(),
@@ -99,17 +101,17 @@ model = Sequential([
     Dense(4, activation="softmax")
 ])
 
+
 model.compile(
     optimizer=Adam(learning_rate=0.0001),
     loss="categorical_crossentropy",
     metrics=["accuracy"]
 )
 
+
 model.summary()
 
-# -----------------------------
-# Callbacks
-# -----------------------------
+
 early_stop = EarlyStopping(
     monitor="val_loss",
     patience=5,
@@ -123,9 +125,7 @@ checkpoint = ModelCheckpoint(
     verbose=1
 )
 
-# -----------------------------
-# Training
-# -----------------------------
+
 history = model.fit(
     train_data,
     validation_data=val_data,
@@ -133,16 +133,16 @@ history = model.fit(
     callbacks=[early_stop, checkpoint]
 )
 
-# -----------------------------
-# Evaluation
-# -----------------------------
+
 test_loss, test_accuracy = model.evaluate(test_data)
 print(f"Test Accuracy: {test_accuracy * 100:.2f}%")
+
 
 predictions = model.predict(test_data)
 predicted_classes = np.argmax(predictions, axis=1)
 true_classes = test_data.classes
 class_labels = list(test_data.class_indices.keys())
+
 
 print("\nClassification Report:")
 print(classification_report(true_classes, predicted_classes, target_names=class_labels))
@@ -150,9 +150,7 @@ print(classification_report(true_classes, predicted_classes, target_names=class_
 print("\nConfusion Matrix:")
 print(confusion_matrix(true_classes, predicted_classes))
 
-# -----------------------------
-# Save Graphs
-# -----------------------------
+
 plt.figure(figsize=(8, 5))
 plt.plot(history.history["accuracy"], label="Training Accuracy")
 plt.plot(history.history["val_accuracy"], label="Validation Accuracy")
@@ -162,6 +160,7 @@ plt.ylabel("Accuracy")
 plt.legend()
 plt.savefig("accuracy_graph.png")
 plt.show()
+
 
 plt.figure(figsize=(8, 5))
 plt.plot(history.history["loss"], label="Training Loss")
@@ -173,4 +172,5 @@ plt.legend()
 plt.savefig("loss_graph.png")
 plt.show()
 
-print("Model training completed and saved successfully at:", MODEL_PATH)
+
+print("Model training completed and saved successfully.")
