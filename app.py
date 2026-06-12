@@ -5,10 +5,17 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 
+# Model path
 MODEL_PATH = "model/brain_tumor_model.h5"
 IMG_SIZE = 150
 
-class_names = ["Glioma Tumor", "Meningioma Tumor", "No Tumor", "Pituitary Tumor"]
+# Class names
+class_names = [
+    "Glioma Tumor",
+    "Meningioma Tumor",
+    "No Tumor",
+    "Pituitary Tumor"
+]
 
 
 @st.cache_resource
@@ -16,7 +23,9 @@ def load_trained_model():
     if not os.path.exists(MODEL_PATH):
         st.error("Model file not found. Please upload model/brain_tumor_model.h5 to GitHub.")
         st.stop()
-    return load_model(MODEL_PATH)
+
+    model = load_model(MODEL_PATH)
+    return model
 
 
 def preprocess_image(uploaded_image):
@@ -45,7 +54,8 @@ def main():
     )
 
     st.warning(
-        "Educational project only. This app is not a real medical diagnosis tool."
+        "This project is only for educational and portfolio purposes. "
+        "It is not a real medical diagnosis tool."
     )
 
     uploaded_file = st.file_uploader(
@@ -55,9 +65,14 @@ def main():
 
     if uploaded_file is not None:
         model = load_trained_model()
+
         img, processed_img = preprocess_image(uploaded_file)
 
-        st.image(img, caption="Uploaded MRI Image", use_container_width=True)
+        st.image(
+            img,
+            caption="Uploaded MRI Image",
+            use_container_width=True
+        )
 
         if st.button("Predict"):
             prediction = model.predict(processed_img)
